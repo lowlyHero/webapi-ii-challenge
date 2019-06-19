@@ -8,7 +8,7 @@ const router = express.Router();
 
 router.get('/', async (req, res) => {
     try {
-        const posts = await Posts.find();
+        const posts = await Posts.find(req.query);
         res.status(200).json(posts)
     } catch(error) {
         console.log(error);
@@ -52,6 +52,13 @@ router.get('/:id/comments', async (req, res) => {
 //========== POST ================
 
 router.post('/', async (req, res) => {
+    if(!req.body.title || !req.body.contents) {
+        res.status(400).json({
+            message: 'Please provide title and contents for the post.'
+        })
+    } else {
+        res.status(201).json(post)
+    }
     try {
         const post = await Posts.insert(req.params.post);
         res.status(201).json(post)
@@ -99,8 +106,10 @@ router.delete('/:id', async (req, res) => {
 //=========== PUT ===============
 
 router.put('/:id', async (req, res) => {
+    // If else statement to test if req.body is missing title or contents
+
     try {
-    const post = await Posts.update(req.params.id, req.params.post);
+    const post = await Posts.update(req.params.id, req.params.body);
 
     if (post) {
         res.status(200).json(post);
