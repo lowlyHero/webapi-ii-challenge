@@ -1,5 +1,4 @@
 const express = require('express');
-
 const Posts = require('../data/db');
 
 const router = express.Router();
@@ -37,6 +36,8 @@ router.get('/:id', async (req, res) => {
     }
 });
 
+//========= GET COMMENTS ==========
+
 router.get('/:id/comments', async (req, res) => {
     try {
         const postId = await Posts.findCommentById(req.params.id)
@@ -57,16 +58,20 @@ router.post('/', async (req, res) => {
             message: 'Please provide title and contents for the post.'
         })
     } else {
-        res.status(201).json(post)
-    }
-    try {
-        const post = await Posts.insert(req.params.post);
-        res.status(201).json(post)
-    } catch(error) {
-        console.log(error);
-        res.status(500).json({
-            message: 'There was an error while saving the post to the database',
-        });
+        try {
+            let newPost = {
+                title: req.body.title,
+                contents: req.body.contents
+            };
+            let createdPostId = await Posts.insert(newPost);
+            let createdPost = await Posts.findById(createdPostId.id)
+            res.status(201).json(createdPost);
+        } catch(error) {
+            console.log(error);
+            res.status(500).json({
+                message: 'There was an error while saving the post to the database.',
+            });
+        }
     }
 });
 
@@ -89,7 +94,10 @@ router.delete('/:id', async (req, res) => {
     const posts = await Posts.remove(req.params.id);
 
     if (posts) {
-        res.status(200).json(posts);
+        res.status(200).json({
+            message: 'The post has been removed', 
+            posts
+        });
     } else {
         res.status(404).json({
             message: 'The post with the specified ID does not exist.',
@@ -106,10 +114,15 @@ router.delete('/:id', async (req, res) => {
 //=========== PUT ===============
 
 router.put('/:id', async (req, res) => {
-    // If else statement to test if req.body is missing title or contents
-
+    if(!req.body.title || !req.body.contents) {
+        res.status(400).json({
+            message: 'Please provide title and contents for the post.'
+        })
+    } else {
+        res.status(200).json(post)
+    }
     try {
-    const post = await Posts.update(req.params.id, req.params.body);
+    const post = await Posts.update(req.params.id, req.params.post);
 
     if (post) {
         res.status(200).json(post);
@@ -121,7 +134,7 @@ router.put('/:id', async (req, res) => {
     } catch(error) {
         console.log(error);
         res.status(500).json({
-            message: 'The post information could not be retrieved.',
+            message: 'The post information could not be modified.',
         });
     }
 });
