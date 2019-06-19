@@ -76,14 +76,24 @@ router.post('/', async (req, res) => {
 });
 
 router.post('/:id/comments', async (req, res) => {
-    try {
-        const postId = await Posts.findCommentById(req.params.id)
-        res.status(201).json(postId)
-    } catch(error) {
-        console.log(error);
-        res.status(404).json({
-            message: 'The post with the specified ID does not exist.',
-        });
+    if(!req.body.text) {
+        res.status(400).json({
+            message: 'Please provide text for the comment.'
+        })
+    } else {
+        try {
+            let newComment = {
+                text: req.body.text
+            };
+            let createdCommentId = await Posts.insertComment(newComment);
+            let createdComment = await Posts.findById(createdCommentId.id)
+            res.status(201).json(createdComment);
+        } catch(error) {
+            console.log(error);
+            res.status(404).json({
+                message: 'The post with the specified ID does not exist.',
+            });
+        }
     }
 });
 
@@ -119,23 +129,22 @@ router.put('/:id', async (req, res) => {
             message: 'Please provide title and contents for the post.'
         })
     } else {
-        res.status(200).json(post)
-    }
-    try {
-    const post = await Posts.update(req.params.id, req.params.post);
-
-    if (post) {
-        res.status(200).json(post);
-    } else {
-        res.status(404).json({
-            message: 'The post with the specified ID does not exist.',
-        })
-    }
-    } catch(error) {
-        console.log(error);
-        res.status(500).json({
-            message: 'The post information could not be modified.',
-        });
+        try {
+            const post = await Posts.update(req.params.id, req.body);
+        
+            if (post) {
+                res.status(200).json(post);
+            } else {
+                res.status(404).json({
+                    message: 'The post with the specified ID does not exist.',
+                })
+            }
+            } catch(error) {
+                console.log(error);
+                res.status(500).json({
+                    message: 'The post information could not be modified.',
+                });
+            }
     }
 });
 
