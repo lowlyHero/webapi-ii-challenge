@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import axios from 'axios';
 import { Route } from 'react-router-dom';
 
-import Posts from './components/Posts';
+import { NavBar, Posts } from './components';
 
 import './App.css';
 
@@ -32,12 +32,26 @@ class App extends Component {
   render() {
     return (
       <div className="App">
+        <Route exact path='/' component={NavBar} />
         <Route path='/posts' render={props => {
           return (
-            <div>
-            
+          <div>
+            <NavBar />
+              <div className='container'>
               <Posts {...props} posts={this.state.posts} />
+               <ul className='circles'>
+                  <li />
+                  <li />
+                  <li />
+                  <li />
+                  <li />
+                  <li />
+                  <li />
+                  <li />
+                  <li />
+                </ul>
             </div>
+          </div>
           )
         }}
         />
