@@ -4,9 +4,10 @@ import { NavLink } from 'react-router-dom';
 const NavBar = () => {
     return (
         <div className='nav-wrapper'>
-            <NavLink to='/posts'>Posts</NavLink> <br />
+            <NavLink to='/'> Home </NavLink>
+            <NavLink to='/posts'> Posts </NavLink>
         </div>
     )
 }
 
-export default NavBar
+export default NavBar;

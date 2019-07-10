@@ -22,7 +22,7 @@ class App extends Component {
     axios
     .get('http://localhost:3000/posts')
     .then((posts) => {
-      this.setState({ posts: posts.data })
+      this.setState({ posts: posts.data });
     })
     .catch((err) => {
       console.log(err);
