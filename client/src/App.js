@@ -1,26 +1,46 @@
 import React, {Component} from 'react';
+import axios from 'axios';
+import { Route } from 'react-router-dom';
+
+import Posts from './components/Posts';
+
 import './App.css';
 
 class App extends Component {
-  state = {
-    posts: []
+  constructor(props) {
+    super(props);
+    this.state = {
+      posts: []
+    };
   }
 
   componentDidMount() {
-    fetch('/posts')
-      .then(res => res.json())
-      .then(posts => this.setState({ posts }));
+    this.getPosts();
+  }
+
+  getPosts = () => {
+    axios
+    .get('http://localhost:3000/posts')
+    .then((posts) => {
+      this.setState({ posts: posts.data })
+    })
+    .catch((err) => {
+      console.log(err);
+    })
   }
 
   render() {
     return (
       <div className="App">
-        <h1>Posts</h1>
-        {this.state.posts.map(post =>
-          <div key={post.created_at}>
-          <h2>{post.title}</h2>
-          </div>
-        )}
+        <Route path='/posts' render={props => {
+          return (
+            <div>
+            
+              <Posts {...props} posts={this.state.posts} />
+            </div>
+          )
+        }}
+        />
       </div>
     );
   }
